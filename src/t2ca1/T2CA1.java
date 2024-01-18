@@ -5,17 +5,21 @@
 package t2ca1;
 
 /**
- *
- * @author User
+ * @date    18/01/24
+ * @author  Yevhen Kuropiatnyk
+ * @email   evgeniy.kuropyatnik@gmail.com
+ * @student sba23066
  */
 public class T2CA1 {
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
-        //2
-    }
     
+    static mainLogic mLogic = new mainLogic(); 
+
+    public static void main(String[] args) {
+       
+        //mLogic.makeTestFile();
+        mLogic.treatFile();
+        
+        
+    }
+   
 }
