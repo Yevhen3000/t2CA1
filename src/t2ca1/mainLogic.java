@@ -25,10 +25,9 @@ public class mainLogic {
     
     private BufferedWriter outputF;
     private BufferedReader inputF;
-    private int total_count = 0;
+    private int total_count;
     private boolean verbal = true;
-    private int local_count = 1;
-    private boolean canGoOn;
+    private int local_count;
     private boolean canWrite;
     
     private String Regex_combination_of_letters_or_numbers = "^[a-zA-Z0-9]+$"; //"^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]+$";
@@ -42,21 +41,7 @@ public class mainLogic {
     public boolean treatFile(){
        
         total_count = 0;
-        
-        try {
-            inputF = new BufferedReader(new FileReader(myInFile)); // Try open the file
-        } catch (Exception e) {
-            System.out.println("Open file error: " + e );
-            return false;
-        }
-
-//        Sam Weiss
-//        5
-//        22DIP1123
-//        Steve Rodgers
-//        7
-//        20MSC1914
-        
+        local_count = 1;
         String line;
         
         int index_firstName  = 0;
@@ -65,18 +50,28 @@ public class mainLogic {
         int studentClass;
         String studentWorkload ="";
         String studentSecondName ="";
-        String StudentNumber = "";
-                
+        String StudentNumber = "";       
+        
         try {
-            line = inputF.readLine();
-            while (line != null) {
+            inputF = new BufferedReader(new FileReader(myInFile)); // Try to open the raw students' data file
+        } catch (Exception e) {
+            System.out.println("Open file error: " + e );
+            return false;
+        }        
+
+        write2File("",false);       // Reset file content
+        canWrite = true;                            // A flag to determine that student's record is valid and can be written to the file
+        
+        try {
+            line = inputF.readLine();               // Read a line from the file
+            while (line != null) {                  // End of file ?
                 
-                if (!line.trim().isEmpty()) { //Check for empty line and skip it
-                    canWrite = true; 
+                if (!line.trim().isEmpty()) {       //Check for empty line and skip it
+                    
                     if (verbal) System.out.print(local_count + ") " + line + " "); // Show line for user and apopriate error if there is
                     
                     switch (local_count) {
-                        case 1:
+                        case 1:     // Validate the first line of a student's data record
                             String[] studentCredians = line.trim().split(" ");
                             studentSecondName = studentCredians[index_secondName];
                             // condition 1b check
@@ -95,9 +90,9 @@ public class mainLogic {
                             }
                             break;
                             
-                        case 2: // condition 1c check 
+                        case 2: // Validate the second line of a student's data record
                             studentClass = Integer.parseInt(line);
-                            if (studentClass<1 || studentClass>8) {
+                            if (studentClass<1 || studentClass>8) { // condition 1c check 
                                 logShowErr("[Error] the number of classes must be an integer value between 1 and 8 (inclusive)");
                             } else {
                                 studentWorkload = getStudentWorkload(studentClass);
@@ -105,25 +100,58 @@ public class mainLogic {
                             }
                             break;
                         
-                        case 3: // 1d)	the student “number” must be a minimum of 6 characters with the first 2 characters being numbers, 
+                        case 3: // Validate the third line of a student's data record
+
                                 // the 3rd  and 4th characters (and possibly 5th ) being a letter, and everything after the last letter character being a number. 
-                            StudentNumber = line;
+                            if (line.trim().length()<6) { // 1d check
+                                logShowErr("[Error] the student “number” must be a minimum of 6 characters ");
+                            } else {
+                                String first2characters_numbers = line.substring(0, 2);
+                                int studentYear = Integer.parseInt(first2characters_numbers); //with the first 2 characters being numbers, 
+                                if (studentYear<20) { // DW1 check: Ensure that the student number year is at least 2020 (i.e. that the number starts with 20 or higher)
+                                    logShowErr("[Error] the year is not valid in students's number (Must be 20 or higher)");
+                                } else {
+                                    char L1 = line.charAt(2);
+                                    char L2 = line.charAt(3);
+                                    char L3 = line.charAt(4);
+                                    
+                                    if (Character.isLetter(L1) && Character.isLetter(L2)){
+                                        
+                                        int pos = 4;
+                                        if (Character.isLetter(L3)) pos = 5;
+                                        String reasonableNumber = line.substring(pos);
+                                        int intReasonableNumber = Integer.parseInt(reasonableNumber);
+                                        if (intReasonableNumber<1 || intReasonableNumber>200) {
+                                            logShowErr("[Error] students's number " + intReasonableNumber + " is not reasonable (must be between 1 and 200)");
+                                        } else {
+                                            System.out.println(first2characters_numbers + " " + reasonableNumber);
+                                            StudentNumber = line;
+                                        }
+                                        
+                                    } else {
+                                        logShowErr("[Error] the 3rd  and 4th characters (and possibly 5th ) in student's number must be a letter");
+                                    }
+                                    
+                                }
+                            }
+                            
                             
                             break;                            
                     }
                     
                     if (canWrite) {
                         if (verbal) System.out.println(" [OK]");
-                        if(local_count>2) write2File(StudentNumber + " - " + studentSecondName + "\n" +  studentWorkload );
                     } 
 
                 }
                 
-                local_count++;
-                if(local_count>3) {
+                local_count++;              // Increase file line counter
+                if(local_count>3) {         // If we've read 3 lines (student's record) go on to next one
                     local_count = 1;
                     System.out.println("");
-                    canGoOn = true;
+                    System.out.println("canWrite:" + canWrite);
+                    if(canWrite) write2File(StudentNumber + " - " + studentSecondName + "\n" +  studentWorkload, true );
+                    canWrite = true;         // Reset flag
                 }                
                 
                 line = inputF.readLine();   // Read next line from the file
@@ -137,11 +165,11 @@ public class mainLogic {
         return true;
     }
 
-    public void write2File(String studentData ){
+    public void write2File(String studentData, boolean append ){
         try {
-            outputF  = new BufferedWriter(new FileWriter(myOutFile, true ));
+            outputF  = new BufferedWriter(new FileWriter(myOutFile, append ));
             outputF.write(studentData);
-            outputF.newLine();
+            if (append) outputF.newLine();
             outputF.close();
         } catch (Exception e) {
             if (verbal) System.out.println("ERROR [write2File]: " + e);
