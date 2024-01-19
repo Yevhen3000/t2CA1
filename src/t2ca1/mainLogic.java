@@ -37,6 +37,7 @@ public class mainLogic {
     private boolean verbal;                             // Mode of verbal ineraction with user: true - show all messages, false - just results
     private int local_count;                            // Counter for keeping student's record position (line)
     
+    public String version = "1.0";                      // Holds current version
     public boolean canWrite;                            // Flag to indicate if data are valid and can be written to the output file
     public String studentWorkload ="";                  // Holds current student's worckload
     public String studentSecondName ="";                // Holds current student's second name
@@ -58,6 +59,7 @@ public class mainLogic {
     public boolean treatFile(boolean clearOutputFile){ //clearOutputFile - clear the output file (true) or not (false)
         total_count = 0;    // Initialize counters
         local_count = 1;
+        successRecords = 0;
         String line;
         
         try {
@@ -167,13 +169,13 @@ public class mainLogic {
         boolean ret = true;
         
         String[] studentCredians = line.trim().split(" ");
-        studentSecondName = studentCredians[index_secondName];
         
         if (studentCredians.length<=1) { // condition 1b check
             logShowErr("[Error] the second name must be separated from the first name by a single space");
             ret = false;
         } else {
             
+            studentSecondName = studentCredians[index_secondName];
             if (!(studentCredians[index_firstName].matches(Regex_just_letters))) { // condition 1a check  
                 logShowErr("[Error] the first name must be letters only");
                 ret = false;
