@@ -23,16 +23,24 @@ public class mainLogic {
     private String myInFile = "students.txt";
     private String myOutFile = "status.txt";
     
+    private final String ANSI_GREEN_BACKGROUND = "\u001B[42m";
+    private final String ANSI_RED_BACKGROUND = "\u001B[41m";
+    private final String ANSI_GREEN = "\u001B[32m";
+    private final String ANSI_RED = "\u001B[31m";
+    private final String ANSI_WHITE = "\u001B[37m";
+    private final String ANSI_RESET = "\u001B[0m";
+    
     private BufferedWriter outputF;
     private BufferedReader inputF;
-    private int total_count;
     private boolean verbal = true;
     private int local_count;
-    public boolean canWrite;
     
+    public boolean canWrite;
     public String studentWorkload ="";
     public String studentSecondName ="";
     public String StudentNumber = ""; 
+    public int total_count;
+    public int successRecords = 0;
     
     private String Regex_combination_of_letters_or_numbers = "^[a-zA-Z0-9]+$"; //"^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]+$";
     private String Regex_just_letters = "^(?=.*[a-zA-Z])[a-zA-Z]+$"; //"\\w+\\.?"
@@ -40,16 +48,15 @@ public class mainLogic {
     
     public mainLogic(){
         // Init
-    }    
+    }
+    public mainLogic(boolean ShowMessages){
+       verbal = ShowMessages;
+    }        
     
     public boolean treatFile(){
-       
         total_count = 0;
         local_count = 1;
         String line;
-        
-      
-            
         
         try {
             inputF = new BufferedReader(new FileReader(myInFile)); // Try to open the raw students' data file
@@ -83,14 +90,25 @@ public class mainLogic {
                             break;                            
                     }
                     
-                    if (canWrite && verbal) System.out.println(" [OK]");
+                    if (verbal) { // Just for pritty output
+                        if (!canWrite) {
+                            System.out.println("");
+                        } else {
+                            System.out.println(" " + ANSI_GREEN + "[OK]" + ANSI_RESET);
+                            //System.out.println(" " + ANSI_WHITE + ANSI_GREEN_BACKGROUND + "[OK]" + ANSI_RESET);
+                            
+                        }
+                    }
                 }
                 
                 local_count++;              // Increase file line counter
                 if(local_count>3) {         // If we've read 3 lines (student's record) go on to next one
                     local_count = 1;
-                    System.out.println("");
-                    if(canWrite) write2File(StudentNumber + " - " + studentSecondName + "\n" +  studentWorkload, true );
+                    if (verbal) System.out.println("");
+                    if(canWrite) {
+                        write2File(StudentNumber + " - " + studentSecondName + "\n" +  studentWorkload, true );
+                        successRecords++;
+                    }
                     canWrite = true;         // Reset flag
                 }                
                 
@@ -105,6 +123,11 @@ public class mainLogic {
         return true;
     }
 
+    
+    public void treatConsole(){
+        //111
+    }
+    
     public void validateL1(String line){
         int index_firstName  = 0;
         int index_secondName  = 1;
@@ -167,15 +190,21 @@ public class mainLogic {
 
                 if (Character.isLetter(L1) && Character.isLetter(L2)){ //the 3rd  and 4th characters (and possibly 5th ) being a letter
 
-                    int pos = 4;
-                    if (Character.isLetter(L3)) pos = 5;
-                    String reasonableNumber = line.substring(pos);
-                    int intReasonableNumber = Integer.parseInt(reasonableNumber);
-                    if (intReasonableNumber<1 || intReasonableNumber>200) {
-                        logShowErr("[Error] students's number " + intReasonableNumber + " is not reasonable (must be between 1 and 200)");
+                    int pos = 4;                                            // if there are 2 letters
+                    if (Character.isLetter(L3)) pos = 5;                 // correction if there are 3 letters
+                    String reasonableNumber = line.substring(pos); // get number after letters
+                    
+                    if (isNumeric(reasonableNumber)) {                  // Check is this number for sure
+
+                        int intReasonableNumber = Integer.parseInt(reasonableNumber);
+                        if (intReasonableNumber<1 || intReasonableNumber>200) {
+                            logShowErr("[Error] students's number " + intReasonableNumber + " is not reasonable (must be between 1 and 200)");
+                        } else {
+                            if (verbal) System.out.print(first2characters_numbers + " " + reasonableNumber);
+                            StudentNumber = line;
+                        }
                     } else {
-                        System.out.print(first2characters_numbers + " " + reasonableNumber);
-                        StudentNumber = line;
+                        logShowErr("[Error] there must be not more than 3 letters");
                     }
 
                 } else {
@@ -198,8 +227,8 @@ public class mainLogic {
     }    
     
     public void logShowErr(String errMessage){
-         System.out.println(errMessage);
-         canWrite = false;
+        if (verbal) System.out.print(ANSI_RED + errMessage + ANSI_RESET);
+        canWrite = false;
     }
     
     public String getStudentWorkload(int studentClass){

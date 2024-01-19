@@ -12,14 +12,14 @@ package t2ca1;
  */
 public class T2CA1 {
     
-    static mainLogic mLogic = new mainLogic(); 
+    
+    static mainMenu mMenu = new mainMenu();
 
     public static void main(String[] args) {
        
-        //mLogic.makeTestFile();
-        mLogic.treatFile();
+        mMenu.Show();
         
-        
+       
     }
    
 }
