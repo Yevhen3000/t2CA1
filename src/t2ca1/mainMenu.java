@@ -14,7 +14,7 @@ import java.util.Scanner;
  */
 
 public class mainMenu {
-
+    // Colors to brighten up the gray routine
     public final String ANSI_RESET = "\u001B[0m";
     public final String ANSI_BLACK = "\u001B[30m";
     public final String ANSI_RED = "\u001B[31m";
@@ -26,14 +26,13 @@ public class mainMenu {
     public final String ANSI_WHITE = "\u001B[37m";
     
     public mainLogic mLogic;
-    
     private Scanner sc  = new Scanner(System.in);
     
     public mainMenu() {
         mLogic = new mainLogic(true );
     }
     
-    public void ShowPromt() {
+    public void ShowPromt() { // Show main menu to user and promt
         System.out.println(ANSI_PURPLE + "################# MAIN MENU ################" + ANSI_RESET);
         System.out.println(ANSI_PURPLE +"#                                        " + ANSI_PURPLE +"  #");
         System.out.println(ANSI_PURPLE +"#  " + ANSI_BLUE + "[1] Treat students' data from the file" + ANSI_PURPLE +"  #");
@@ -44,7 +43,7 @@ public class mainMenu {
         System.out.println("Please, enter menu command number:");        
     }    
 
-    public void Show() {
+    public void Show() {                // Main menu cycle, hit 3 to exit the programm
         String choice;                  // Holds user's input string
         
         while (true) {                  // General menu cycle
@@ -53,7 +52,7 @@ public class mainMenu {
                 choice = sc.nextLine(); //choice = (char) System.in.read();
                 switch (choice) {
                     case "1":
-                        mLogic.treatFile(); // Process data from the file
+                        mLogic.treatFile(true); // Process data from the file
                         System.out.println("Done. Treated lines:" + mLogic.total_count +", success records:" +mLogic.successRecords );
                         break;
 
@@ -62,10 +61,10 @@ public class mainMenu {
                         break;
 
                     case "3":
-                        menuShutDown();         // Exit and go home
+                        menuShutDown();        // Exit and go home
                         break;
 
-                    default:                    // User has entered string different from 1,2,3
+                    default:                   // User has entered string different from 1,2,3
                         System.out.println("Please, enter correct menu number:");
                         break;                            
                 }

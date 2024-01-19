@@ -1,6 +1,5 @@
 package t2ca1;
 
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
@@ -35,7 +34,7 @@ public class mainLogic {
     
     private BufferedWriter outputF;
     private BufferedReader inputF;
-    private boolean verbal = true;                      // Mode of verbal ineraction with user: true - show all, false - just results
+    private boolean verbal = true;                      // Mode of verbal ineraction with user: true - show all messages, false - just results
     private int local_count;                            // Counter for keeping student's record position (line)
     
     public boolean canWrite;                            // Flag to indicate if data are valid and can be written to the output file
@@ -56,8 +55,8 @@ public class mainLogic {
        verbal = ShowMessages;
     }        
     
-    public boolean treatFile(){
-        total_count = 0;
+    public boolean treatFile(boolean clearOutputFile){
+        total_count = 0;    // Init counters
         local_count = 1;
         String line;
         
@@ -68,7 +67,7 @@ public class mainLogic {
             return false;
         }        
 
-        write2File("",false);       // Reset file content
+        if(clearOutputFile) write2File("",false);       // Reset file content
         canWrite = true;                            // A flag to determine that student's record is valid and can be written to the file
         
         try {
@@ -125,41 +124,71 @@ public class mainLogic {
     }
 
     
-    public void treatConsole(){
+    public void treatConsole(){ // Validate users's console input
         
-        String studentNameFS;
-        local_count = 1;
-        do  {
-            studentNameFS = getUserInput("Please, enter student first and second names separated by one space [CANCEL to return to main menu]:");
-        } while (studentNameFS.isEmpty());
-        if (verbal) System.out.print(local_count + ") " + studentNameFS + " " );
-        validateL1(studentNameFS);
+        String userInpurString;
+        boolean canGoOn = false;
+
+        while(!canGoOn) {
+            do  {
+                userInpurString = getUserInput("\nPlease, enter student first and second names separated by one space [CANCEL to return to the main menu]:");
+            } while (userInpurString.isEmpty());
+            if(userInpurString.equalsIgnoreCase("cancel")) return;
+            if (validateL1(userInpurString)) canGoOn = true;
+        }
+        
+        canGoOn = false;
+        while(!canGoOn) {
+            do  {
+                userInpurString = getUserInput("\nPlease, enter student's classes count, integer more than one [CANCEL to return to the main menu]:");
+            } while (userInpurString.isEmpty());
+            if(userInpurString.equalsIgnoreCase("cancel")) return;
+            if (validateL2(userInpurString)) canGoOn = true;
+        }
+
+        canGoOn = false;
+        while(!canGoOn) {
+            do  {
+                userInpurString = getUserInput("\nPlease, enter student's number, [CANCEL to return to the main menu].Format YYLLLDDD, where YY - the last two digits of the year, LLL - letters 2 or 3, DDD - number within 1-200:");
+            } while (userInpurString.isEmpty());
+            if(userInpurString.equalsIgnoreCase("cancel")) return;
+            if (validateL3(userInpurString)) canGoOn = true;
+        }
+                
+        write2File(StudentNumber + " - " + studentSecondName + "\n" +  studentWorkload, true );
+        successRecords++;
+        System.out.println("\nDone" );
         
     }
     
-    public void validateL1(String line){
+    public boolean validateL1(String line){ // Validate student's first and second names
         int index_firstName  = 0;
         int index_secondName  = 1;
+        boolean ret = true;
         
         String[] studentCredians = line.trim().split(" ");
         studentSecondName = studentCredians[index_secondName];
         
         if (studentCredians.length<=1) { // condition 1b check
             logShowErr("[Error] the second name must be separated from the first name by a single space");
+            ret = false;
         } else {
             
             if (!(studentCredians[index_firstName].matches(Regex_just_letters))) { // condition 1a check  
                 logShowErr("[Error] the first name must be letters only");
+                ret = false;
             } else {
                 
                 if (!(studentSecondName.matches(Regex_combination_of_letters_or_numbers))) { // condition 1b check 
                     logShowErr("[Error] the second name can be letters and/or numbers");
+                    ret = false;
                 }          
             }
         }
+        return ret;
     }
     
-    public boolean isNumeric(String str) { 
+    public boolean isNumeric(String str) { // Check if given String is a number to catch an error
         try {  
           Double.parseDouble(str);  
           return true;
@@ -168,30 +197,36 @@ public class mainLogic {
         }  
       }
     
-    public void validateL2(String line){
+    public boolean validateL2(String line){ // Validate student's classes
         int studentClass;
+        boolean ret = true;
         if (isNumeric(line)) {
             studentClass = Integer.parseInt(line);
             if (studentClass<1 || studentClass>8) { // condition 1c check 
                 logShowErr("[Error] the number of classes must be an integer value between 1 and 8 (inclusive)");
+                ret = false;
             } else {
                 studentWorkload = getStudentWorkload(studentClass);
                 if (verbal) System.out.print(" [" + studentWorkload + "] " );
             }
         } else {
             logShowErr("[Error] student's class is not a number");
+            ret = false;
         }
+        return ret;
     }
     
-    public void validateL3(String line){
-
+    public boolean validateL3(String line){ // Validate student's number
+        boolean ret = true;
         if (line.trim().length()<6) { // 1d check
             logShowErr("[Error] the student “number” must be a minimum of 6 characters ");
+            ret = false;
         } else {
             String first2characters_numbers = line.substring(0, 2);
             int studentYear = Integer.parseInt(first2characters_numbers); //with the first 2 characters being numbers, 
             if (studentYear<20) { // DW1 check: Ensure that the student number year is at least 2020 (i.e. that the number starts with 20 or higher)
                 logShowErr("[Error] the year is not valid in students's number (Must be 20 or higher)");
+                ret = false;
             } else {
                 char L1 = line.charAt(2);
                 char L2 = line.charAt(3);
@@ -208,23 +243,26 @@ public class mainLogic {
                         int intReasonableNumber = Integer.parseInt(reasonableNumber);
                         if (intReasonableNumber<1 || intReasonableNumber>200) {
                             logShowErr("[Error] students's number " + intReasonableNumber + " is not reasonable (must be between 1 and 200)");
+                            ret = false;
                         } else {
                             if (verbal) System.out.print(first2characters_numbers + " " + reasonableNumber);
                             StudentNumber = line;
                         }
                     } else {
                         logShowErr("[Error] there must be not more than 3 letters");
+                        ret = false;
                     }
 
                 } else {
                     logShowErr("[Error] the 3rd  and 4th characters (and possibly 5th ) in student's number must be a letter");
+                    ret = false;
                 }
-
             }
         }
+        return ret;
     }
     
-    public void write2File(String studentData, boolean append ){
+    public void write2File(String studentData, boolean append ){ // Write formatted and validated data to the file
         try {
             outputF  = new BufferedWriter(new FileWriter(myOutFile, append ));
             outputF.write(studentData);
@@ -235,12 +273,12 @@ public class mainLogic {
         }            
     }    
     
-    public void logShowErr(String errMessage){
+    public void logShowErr(String errMessage){ // Just to shorten and centrilize error output and turn the error flag on
         if (verbal) System.out.print(ANSI_RED + errMessage + ANSI_RESET);
         canWrite = false;
     }
     
-    public String getStudentWorkload(int studentClass){
+    public String getStudentWorkload(int studentClass){ // Get a string with workload description by class number 
         String Workload = "";
         if (studentClass==1) {
             Workload = "Very Light";
@@ -254,12 +292,12 @@ public class mainLogic {
         return Workload;
     }
     
-    public String getUserInput(String message){
+    public String getUserInput(String message){ // Get a string from user
         String useInput = "";
         Scanner sc  = new Scanner(System.in);
         boolean bInputOk = false;
         while (!bInputOk) {
-            if (!message.equalsIgnoreCase("")) System.out.println(message);
+            if (!message.equalsIgnoreCase("")) System.out.println(message); // Show a promt to user (optional)
             try {
                 useInput = sc.nextLine();
                 bInputOk = true;
@@ -270,7 +308,7 @@ public class mainLogic {
         return useInput;
     }
     
-    public void makeTestFile(){
+    public void makeTestFile(){ // Just to avoid a manual work
         try {
             outputF  = new BufferedWriter(new FileWriter(myInFile, false));
             outputF.write("Sam Weiss\n" +
