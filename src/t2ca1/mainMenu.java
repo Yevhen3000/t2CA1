@@ -7,8 +7,10 @@ package t2ca1;
 import java.util.Scanner;
 
 /**
- *
- * @author User
+ * @date    18/01/24
+ * @author  Yevhen Kuropiatnyk
+ * @email   evgeniy.kuropyatnik@gmail.com
+ * @student sba23066
  */
 
 public class mainMenu {
@@ -28,66 +30,60 @@ public class mainMenu {
     private Scanner sc  = new Scanner(System.in);
     
     public mainMenu() {
-       // Init
-        mLogic = new mainLogic(false);
+        mLogic = new mainLogic(true );
     }
     
     public void ShowPromt() {
-        System.out.println(ANSI_PURPLE + "...-----====== MAIN MENU ======-----..." + ANSI_RESET);
-        System.out.println(ANSI_BLUE + "[1] Treat students' data from the file");
-        System.out.println(ANSI_GREEN+ "[2] Add students' data via the console");
-        System.out.println(ANSI_CYAN+ "[3] Exit");
-        System.out.println(ANSI_PURPLE +"--------------------------------------" + ANSI_RESET);
+        System.out.println(ANSI_PURPLE + "################# MAIN MENU ################" + ANSI_RESET);
+        System.out.println(ANSI_PURPLE +"#                                        " + ANSI_PURPLE +"  #");
+        System.out.println(ANSI_PURPLE +"#  " + ANSI_BLUE + "[1] Treat students' data from the file" + ANSI_PURPLE +"  #");
+        System.out.println(ANSI_PURPLE +"#  " + ANSI_GREEN+ "[2] Add students' data via the console"  + ANSI_PURPLE +"  #");
+        System.out.println(ANSI_PURPLE +"#  " + ANSI_RED + "[3] Exit"  + ANSI_PURPLE +"                                #");
+        System.out.println(ANSI_PURPLE +"#                                        " + ANSI_PURPLE +"  #");
+        System.out.println(ANSI_PURPLE +"############################################" + ANSI_RESET);
         System.out.println("Please, enter menu command number:");        
     }    
 
     public void Show() {
-        String choice;
-
-        ShowPromt();
-        while (true) {
-            
+        String choice;                  // Holds user's input string
+        
+        while (true) {                  // General menu cycle
+            ShowPromt();                // Show main menu
             try {
                 choice = sc.nextLine(); //choice = (char) System.in.read();
+                switch (choice) {
+                    case "1":
+                        mLogic.treatFile(); // Process data from the file
+                        System.out.println("Done. Treated lines:" + mLogic.total_count +", success records:" +mLogic.successRecords );
+                        break;
 
-                    switch (choice) {
-                        case "1":
-                            //clearScreen();
-                            mLogic.treatFile();
-                            System.out.println("Done. \nTreated lines:" + mLogic.total_count +"\nSuccess records:" +mLogic.successRecords );
-                            ShowPromt();
-                            break;
+                    case "2":
+                        mLogic.treatConsole(); // Process data from user's input (console)
+                        break;
 
-                        case "2":
-                            //clearScreen();
-                            mLogic.treatConsole();
-                            ShowPromt();
-                            break;
-                        
-                        case "3":
-                            clearScreen();
-                            menuShutDown();
-                            break;
+                    case "3":
+                        menuShutDown();         // Exit and go home
+                        break;
 
-                        default:
-                            System.out.println("Please, enter correct menu number:");
-                            break;                            
-                    }
-                
+                    default:                    // User has entered string different from 1,2,3
+                        System.out.println("Please, enter correct menu number:");
+                        break;                            
+                }
 
             } catch (Exception e){
                 System.out.println("Ops, enter a number, please!");
             }
-        }        
+        }  
   
     }
     
     public void menuShutDown() {
         System.out.println("Exiting...");
+        sc.close();             // Release console resource
         System.exit(0);
     }
     
-    public void clearScreen() {  
+    public void clearScreen() {  //Simulation of CLS
         for (int i = 0; i < 50; ++i) System.out.println("");
     }
     

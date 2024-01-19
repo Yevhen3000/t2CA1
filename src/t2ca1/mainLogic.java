@@ -15,14 +15,17 @@ import java.util.Scanner;
  */
 
 /**
- *
- * @author User
+ * @date    18/01/24
+ * @author  Yevhen Kuropiatnyk
+ * @email   evgeniy.kuropyatnik@gmail.com
+ * @student sba23066
  */
 
 public class mainLogic {
-    private String myInFile = "students.txt";
-    private String myOutFile = "status.txt";
+    private String myInFile = "students.txt";           // File name to read data from
+    private String myOutFile = "status.txt";            // File name to write data into
     
+    // Colors to brighten up the gray routine
     private final String ANSI_GREEN_BACKGROUND = "\u001B[42m";
     private final String ANSI_RED_BACKGROUND = "\u001B[41m";
     private final String ANSI_GREEN = "\u001B[32m";
@@ -32,15 +35,15 @@ public class mainLogic {
     
     private BufferedWriter outputF;
     private BufferedReader inputF;
-    private boolean verbal = true;
-    private int local_count;
+    private boolean verbal = true;                      // Mode of verbal ineraction with user: true - show all, false - just results
+    private int local_count;                            // Counter for keeping student's record position (line)
     
-    public boolean canWrite;
-    public String studentWorkload ="";
-    public String studentSecondName ="";
-    public String StudentNumber = ""; 
-    public int total_count;
-    public int successRecords = 0;
+    public boolean canWrite;                            // Flag to indicate if data are valid and can be written to the output file
+    public String studentWorkload ="";                  // Holds current student's worckload
+    public String studentSecondName ="";                // Holds current student's second name
+    public String StudentNumber = "";                   // Holds current student's number
+    public int total_count;                             // Holds total lines from the file treated
+    public int successRecords = 0;                      // Holds counter for valid recods written to the output file
     
     private String Regex_combination_of_letters_or_numbers = "^[a-zA-Z0-9]+$"; //"^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]+$";
     private String Regex_just_letters = "^(?=.*[a-zA-Z])[a-zA-Z]+$"; //"\\w+\\.?"
@@ -95,8 +98,6 @@ public class mainLogic {
                             System.out.println("");
                         } else {
                             System.out.println(" " + ANSI_GREEN + "[OK]" + ANSI_RESET);
-                            //System.out.println(" " + ANSI_WHITE + ANSI_GREEN_BACKGROUND + "[OK]" + ANSI_RESET);
-                            
                         }
                     }
                 }
@@ -125,7 +126,15 @@ public class mainLogic {
 
     
     public void treatConsole(){
-        //111
+        
+        String studentNameFS;
+        local_count = 1;
+        do  {
+            studentNameFS = getUserInput("Please, enter student first and second names separated by one space [CANCEL to return to main menu]:");
+        } while (studentNameFS.isEmpty());
+        if (verbal) System.out.print(local_count + ") " + studentNameFS + " " );
+        validateL1(studentNameFS);
+        
     }
     
     public void validateL1(String line){
