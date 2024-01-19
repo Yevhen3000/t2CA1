@@ -34,7 +34,7 @@ public class mainLogic {
     
     private BufferedWriter outputF;
     private BufferedReader inputF;
-    private boolean verbal = true;                      // Mode of verbal ineraction with user: true - show all messages, false - just results
+    private boolean verbal;                             // Mode of verbal ineraction with user: true - show all messages, false - just results
     private int local_count;                            // Counter for keeping student's record position (line)
     
     public boolean canWrite;                            // Flag to indicate if data are valid and can be written to the output file
@@ -48,15 +48,15 @@ public class mainLogic {
     private String Regex_just_letters = "^(?=.*[a-zA-Z])[a-zA-Z]+$"; //"\\w+\\.?"
     private String Regex_just_numbers = "^(?=.*[0-9])[0-9]+$";
     
-    public mainLogic(){
-        // Init
+    public mainLogic(){ // In case if called without params
+       verbal = true;
     }
-    public mainLogic(boolean ShowMessages){
+    public mainLogic(boolean ShowMessages){ // Initialize class with certain verbal level
        verbal = ShowMessages;
     }        
     
-    public boolean treatFile(boolean clearOutputFile){
-        total_count = 0;    // Init counters
+    public boolean treatFile(boolean clearOutputFile){ //clearOutputFile - clear the output file (true) or not (false)
+        total_count = 0;    // Initialize counters
         local_count = 1;
         String line;
         
@@ -67,7 +67,7 @@ public class mainLogic {
             return false;
         }        
 
-        if(clearOutputFile) write2File("",false);       // Reset file content
+        if(clearOutputFile) write2File("",false);       // Clear the file content
         canWrite = true;                            // A flag to determine that student's record is valid and can be written to the file
         
         try {
@@ -107,9 +107,9 @@ public class mainLogic {
                     if (verbal) System.out.println("");
                     if(canWrite) {
                         write2File(StudentNumber + " - " + studentSecondName + "\n" +  studentWorkload, true );
-                        successRecords++;
+                        successRecords++;    // Increase the counter of success (validated && written) records 
                     }
-                    canWrite = true;         // Reset flag
+                    canWrite = true;         // Reset flag ( inverted in this logic context )
                 }                
                 
                 line = inputF.readLine();   // Read next line from the file
@@ -129,40 +129,40 @@ public class mainLogic {
         String userInpurString;
         boolean canGoOn = false;
 
-        while(!canGoOn) {
+        while(!canGoOn) { // Do while untill user enter data in the right format
             do  {
                 userInpurString = getUserInput("\nPlease, enter student first and second names separated by one space [CANCEL to return to the main menu]:");
             } while (userInpurString.isEmpty());
-            if(userInpurString.equalsIgnoreCase("cancel")) return;
+            if(userInpurString.equalsIgnoreCase("cancel")) return; // Check if the user wants to abort
             if (validateL1(userInpurString)) canGoOn = true;
         }
         
         canGoOn = false;
-        while(!canGoOn) {
+        while(!canGoOn) { // Do while untill user enter data in the right format
             do  {
                 userInpurString = getUserInput("\nPlease, enter student's classes count, integer more than one [CANCEL to return to the main menu]:");
             } while (userInpurString.isEmpty());
-            if(userInpurString.equalsIgnoreCase("cancel")) return;
+            if(userInpurString.equalsIgnoreCase("cancel")) return; // Check if the user wants to abort
             if (validateL2(userInpurString)) canGoOn = true;
         }
 
         canGoOn = false;
-        while(!canGoOn) {
+        while(!canGoOn) { // Do while untill user enter data in the right format
             do  {
-                userInpurString = getUserInput("\nPlease, enter student's number, [CANCEL to return to the main menu].Format YYLLLDDD, where YY - the last two digits of the year, LLL - letters 2 or 3, DDD - number within 1-200:");
+                userInpurString = getUserInput("\nPlease, enter student's number. Format YYLLLDDD, where YY - the last two digits of the year, LLL - letters 2 or 3, DDD - number within 1-200  [CANCEL to return to the main menu]:");
             } while (userInpurString.isEmpty());
-            if(userInpurString.equalsIgnoreCase("cancel")) return;
+            if(userInpurString.equalsIgnoreCase("cancel")) return; // Check if the user wants to abort
             if (validateL3(userInpurString)) canGoOn = true;
         }
                 
         write2File(StudentNumber + " - " + studentSecondName + "\n" +  studentWorkload, true );
-        successRecords++;
-        System.out.println("\nDone" );
+        successRecords++;                   // Keep statistics
+        System.out.println("\nDone" );    // Let the user know that input is done
         
     }
     
     public boolean validateL1(String line){ // Validate student's first and second names
-        int index_firstName  = 0;
+        int index_firstName  = 0;           // Make it easier and avoid getting confused in indexes
         int index_secondName  = 1;
         boolean ret = true;
         
@@ -210,7 +210,7 @@ public class mainLogic {
                 if (verbal) System.out.print(" [" + studentWorkload + "] " );
             }
         } else {
-            logShowErr("[Error] student's class is not a number");
+            logShowErr("[Error] student's class is not a number"); // Enhanced error output
             ret = false;
         }
         return ret;
@@ -249,7 +249,7 @@ public class mainLogic {
                             StudentNumber = line;
                         }
                     } else {
-                        logShowErr("[Error] there must be not more than 3 letters");
+                        logShowErr("[Error] there must be not more than 3 letters"); // Enhanced error output
                         ret = false;
                     }
 

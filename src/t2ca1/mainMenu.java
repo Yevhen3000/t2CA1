@@ -40,7 +40,7 @@ public class mainMenu {
         System.out.println(ANSI_PURPLE +"#  " + ANSI_RED + "[3] Exit"  + ANSI_PURPLE +"                                #");
         System.out.println(ANSI_PURPLE +"#                                        " + ANSI_PURPLE +"  #");
         System.out.println(ANSI_PURPLE +"############################################" + ANSI_RESET);
-        System.out.println("Please, enter menu command number:");        
+        System.out.println("Please, enter the menu command number:");        
     }    
 
     public void Show() {                // Main menu cycle, hit 3 to exit the programm
@@ -49,7 +49,7 @@ public class mainMenu {
         while (true) {                  // General menu cycle
             ShowPromt();                // Show main menu
             try {
-                choice = sc.nextLine(); //choice = (char) System.in.read();
+                choice = sc.nextLine(); //choice = (char) System.in.read(); as variant of implementation
                 switch (choice) {
                     case "1":
                         mLogic.treatFile(true); // Process data from the file
@@ -65,7 +65,7 @@ public class mainMenu {
                         break;
 
                     default:                   // User has entered string different from 1,2,3
-                        System.out.println("Please, enter correct menu number:");
+                        System.out.println("Please, enter the correct menu number:");
                         break;                            
                 }
 
@@ -80,10 +80,6 @@ public class mainMenu {
         System.out.println("Exiting...");
         sc.close();             // Release console resource
         System.exit(0);
-    }
-    
-    public void clearScreen() {  //Simulation of CLS
-        for (int i = 0; i < 50; ++i) System.out.println("");
     }
     
 }

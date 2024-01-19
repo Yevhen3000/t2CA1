@@ -17,7 +17,7 @@ public class T2CA1 {
 
     public static void main(String[] args) {
        
-        mMenu.Show();
+        mMenu.Show();   // Launch the main menu
        
     }
    
