@@ -11,11 +11,10 @@ package t2ca1;
  * @student sba23066
  */
 public class T2CA1 {
-    
-    
     static mainMenu mMenu = new mainMenu();
 
     public static void main(String[] args) {
+        //https://github.com/Yevhen3000/t2CA1.git
        
         mMenu.Show();   // Launch the main menu
        
